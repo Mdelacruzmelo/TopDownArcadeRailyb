@@ -14,8 +14,9 @@ public:
 	int SCREEN_HEIGHT = 720;
 	float SCREEN_MARGIN_TOP_LEFT = 30;
 	float SCREEN_MARGIN_BOTTOM_RIGHT = 50;
-	int LevelPosY = 0;
 	float LEVEL_ACCELERATION = 24.0f;
+	int LEVEL_TIME = 30;
+	int LevelPosY = 0;
 
 private:
 
@@ -32,14 +33,13 @@ private:
 
 	float MAX_ACCELERATION = 10.0f;
 
-
-
 	bool IsLimitedRight();
 	bool IsLimitedLeft();
 	bool IsLimitedTop();
 	bool IsLimitedBottom();
 
 	void DrawLevel();
+	void DrawProgressBar();
 	void DrawVehicle();
 
 	// TODO: Preguntar una mejor manera de usar la misma function con static dentro 

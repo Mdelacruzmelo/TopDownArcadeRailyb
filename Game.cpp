@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "Game.h"+
 #include <iostream>
 #include <string>
 
@@ -20,6 +20,15 @@ void Game::Start()
 		BeginDrawing();
 		ClearBackground(BLACK);
 
+
+		DrawText(
+			TextFormat("Coord X: %d \nCoord Y: %d", (int)vehiclePosition.x, (int)vehiclePosition.y),
+			100,
+			300,
+			16,
+			WHITE
+		);
+
 		DrawLevel();
 		DrawVehicle();
 		MoveLevel();
@@ -39,7 +48,31 @@ void Game::DrawLevel() {
 
 	DrawMovingYRectanglesLeft(4);
 	DrawMovingYRectanglesRight(3);
+	DrawProgressBar();
 
+}
+
+void Game::DrawProgressBar() {
+
+	float GrowAlpha = GetTime() / LEVEL_TIME;
+	float Progress = SCREEN_WIDTH * GrowAlpha;
+
+	DrawText(
+		TextFormat("Time: %d", (int)GetTime()),
+		100,
+		540,
+		16,
+		WHITE
+	);
+	DrawText(
+		TextFormat("Time: %f", (float)(GrowAlpha)),
+		100,
+		580,
+		16,
+		WHITE
+	);
+
+	DrawRectangle(0, 0, Progress, 20, WHITE);
 }
 
 void Game::DrawMovingYRectanglesLeft(int quantity) {
@@ -190,7 +223,6 @@ Color* Game::GetRandomColors(int quantity) {
 
 	return RandomColors;
 }
-
 
 //void Game::DrawMovingYRectangles(int quantity) {
 //
