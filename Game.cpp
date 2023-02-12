@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Vehicle.h"
 #include "PlayerController.h"
+#include "AIController.h"
 #include <iostream>
 #include <string>
 
@@ -19,14 +20,10 @@ void Game::Start()
 	InitAudioDevice();
 
 	PlayerController PLAYER = PlayerController();
-
-	// Vehicle EnemyStandard = Vehicle(VEHICLE_STANDARD);
-	// Vehicle EnemyHeavy = Vehicle(VEHICLE_HEAVY);253880
-	// Vehicle EnemyLight = Vehicle(VEHICLE_LIGHT);253880
+	AIController ENEMY = AIController();
 
 	while (!WindowShouldClose())
 	{
-
 		BeginDrawing();
 		ClearBackground(BLACK);
 
@@ -34,13 +31,10 @@ void Game::Start()
 		PLAYER.ListenMovementInputs();
 		PLAYER.ListenAccelerateInput();
 
-		// EnemyStandard.Draw(Vector2{300, 200});
-		// EnemyHeavy.Draw(Vector2{370, 200});
-		// EnemyHeavy.Draw(Vector2{500, 250});
-		// EnemyLight.Draw(Vector2{200, 100});
+		ENEMY.SpawnVehicle();
 
-		DrawLevel();
-		MoveLevel();
+		// DrawLevel();
+		// MoveLevel();
 
 		EndDrawing();
 	}

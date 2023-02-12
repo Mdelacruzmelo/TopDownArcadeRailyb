@@ -6,6 +6,7 @@ class BasicCharacter
 {
 public:
 
+	BasicCharacter();
 	BasicCharacter(
 		int limitTop,
 		int limitRight,

@@ -36,8 +36,42 @@ void Vehicle::Draw(Vector2 Position)
 	DrawRectangle((int)Position.x, (int)Position.y, (int)Size.x, (int)Size.y, WHITE);
 }
 
+void Vehicle::Shoot()
+{
+
+}
+
+void Vehicle::Move()
+{
+	if (bIsGoingRight) {
+		Position.x += Velocity * 1;
+		if (Position.x >= TargetLocation.x) SetNextTargetLocation();
+	}
+	else {
+		Position.x -= Velocity * 1;
+		if (Position.x <= TargetLocation.x) SetNextTargetLocation();
+	}
+}
+
+void Vehicle::SetNextTargetLocation()
+{
+	if (bIsGoingRight) {
+		bIsGoingRight = false;
+		TargetLocation.x = 100;
+	}
+	else {
+		bIsGoingRight = true;
+		TargetLocation.x = 400;
+	}
+}
+
 void Vehicle::Draw()
 {
-	Vector2 Position = { 0, 0 };
-	DrawRectangle((int)Position.x, (int)Position.y, (int)Size.x, (int)Size.y, WHITE);
+	DrawRectangle(
+		(int)Position.x,
+		(int)Position.y,
+		(int)Size.x,
+		(int)Size.y,
+		GREEN
+	);
 }
