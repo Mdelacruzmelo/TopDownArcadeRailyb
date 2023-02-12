@@ -20,29 +20,10 @@ public:
 
 private:
 
-	void Move();
 	void MoveLevel();
-	void Accelerate();
-	void ResetAcceleration();
-
-	Vector2 vehiclePosition;
-
-	float Velocity;
-	float InitialAcceleration = 4.0f;
-	float Acceleration;
-
-	float MAX_ACCELERATION = 10.0f;
-
-	bool IsLimitedRight();
-	bool IsLimitedLeft();
-	bool IsLimitedTop();
-	bool IsLimitedBottom();
-
 	void DrawLevel();
 	void DrawProgressBar();
-	void DrawVehicle();
 
-	// TODO: Preguntar una mejor manera de usar la misma function con static dentro 
 	void DrawMovingYRectanglesLeft(int quantity);
 	void DrawMovingYRectanglesRight(int quantity);
 
@@ -72,20 +53,5 @@ private:
 		MAROON,
 		GREEN,
 		LIME,
-		/*DARKGREEN,
-		SKYBLUE,
-		BLUE,
-		DARKBLUE,
-		PURPLE,
-		VIOLET,
-		DARKPURPLE,
-		BEIGE,
-		BROWN,
-		DARKBROWN,
-		WHITE,
-		BLACK,
-		BLANK,
-		MAGENTA,
-		RAYWHITE*/
 	};
 };

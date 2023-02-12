@@ -1,4 +1,4 @@
-#include "Vehicle.h" +
+#include "Vehicle.h"
 
 Vehicle::Vehicle(E_VehicleType Type)
 {
@@ -9,7 +9,7 @@ Vehicle::Vehicle(E_VehicleType Type)
 		Shield = 100.0f;
 		Speed = 2;
 		Attack = 10;
-		Size = {60, 80};
+		Size = { 60, 80 };
 		break;
 
 	case VEHICLE_LIGHT:
@@ -17,7 +17,7 @@ Vehicle::Vehicle(E_VehicleType Type)
 		Shield = 50.0f;
 		Speed = 8;
 		Attack = 2;
-		Size = {30, 40};
+		Size = { 30, 40 };
 		break;
 
 	case VEHICLE_STANDARD:
@@ -26,18 +26,18 @@ Vehicle::Vehicle(E_VehicleType Type)
 		Shield = 100.0f;
 		Speed = 4;
 		Attack = 5;
-		Size = {40, 60};
+		Size = { 40, 60 };
 		break;
 	}
 };
 
 void Vehicle::Draw(Vector2 Position)
 {
-	DrawRectangle(Position.x, Position.y, Size.x, Size.y, WHITE);
+	DrawRectangle((int)Position.x, (int)Position.y, (int)Size.x, (int)Size.y, WHITE);
 }
 
 void Vehicle::Draw()
 {
-	Vector2 Position = {0, 0};
-	DrawRectangle(Position.x, Position.y, Size.x, Size.y, WHITE);
+	Vector2 Position = { 0, 0 };
+	DrawRectangle((int)Position.x, (int)Position.y, (int)Size.x, (int)Size.y, WHITE);
 }
