@@ -1,13 +1,14 @@
-#include "Game.h" +
-#include "Vehicle.h" +
+#include "Game.h"
+#include "Vehicle.h"
+#include "PlayerController.h"
 #include <iostream>
 #include <string>
 
 Game::Game()
 {
-	vehiclePosition = {(float)SCREEN_WIDTH / 2, (float)SCREEN_HEIGHT / 2};
-	Velocity = 2.0f;
-	Acceleration = 1.0f;
+	// vehiclePosition = {(float)SCREEN_WIDTH / 2, (float)SCREEN_HEIGHT / 2};
+	// Velocity = 2.0f;
+	// Acceleration = 1.0f;
 }
 
 void Game::Start()
@@ -17,30 +18,28 @@ void Game::Start()
 	SetTargetFPS(60);
 	InitAudioDevice();
 
-	Vehicle EnemyStandard = Vehicle(VEHICLE_STANDARD);
-	Vehicle EnemyHeavy = Vehicle(VEHICLE_HEAVY);
-	Vehicle EnemyLight = Vehicle(VEHICLE_LIGHT);
+	PlayerController PLAYER = PlayerController();
+
+	// Vehicle EnemyStandard = Vehicle(VEHICLE_STANDARD);
+	// Vehicle EnemyHeavy = Vehicle(VEHICLE_HEAVY);253880
+	// Vehicle EnemyLight = Vehicle(VEHICLE_LIGHT);253880
 
 	while (!WindowShouldClose())
 	{
-		Move();
+
 		BeginDrawing();
 		ClearBackground(BLACK);
 
-		DrawText(
-			TextFormat("Coord X: %d \nCoord Y: %d", (int)vehiclePosition.x, (int)vehiclePosition.y),
-			100,
-			300,
-			16,
-			WHITE);
+		PLAYER.Spawn();
+		PLAYER.ListenMovementInputs();
+		PLAYER.ListenAccelerateInput();
 
-		EnemyStandard.Draw(Vector2{300, 200});
-		EnemyHeavy.Draw(Vector2{370, 200});
-		EnemyHeavy.Draw(Vector2{500, 250});
-		EnemyLight.Draw(Vector2{200, 100});
+		// EnemyStandard.Draw(Vector2{300, 200});
+		// EnemyHeavy.Draw(Vector2{370, 200});
+		// EnemyHeavy.Draw(Vector2{500, 250});
+		// EnemyLight.Draw(Vector2{200, 100});
 
 		DrawLevel();
-		DrawVehicle();
 		MoveLevel();
 
 		EndDrawing();
@@ -50,14 +49,8 @@ void Game::Start()
 	CloseWindow();
 }
 
-void Game::DrawVehicle()
-{
-	DrawRectangle(vehiclePosition.x, vehiclePosition.y, 20, 20, WHITE);
-}
-
 void Game::DrawLevel()
 {
-
 	DrawMovingYRectanglesLeft(4);
 	DrawMovingYRectanglesRight(3);
 	DrawProgressBar();
@@ -65,8 +58,7 @@ void Game::DrawLevel()
 
 void Game::DrawProgressBar()
 {
-
-	float GrowAlpha = GetTime() / LEVEL_TIME;
+	float GrowAlpha = (float)(GetTime() / LEVEL_TIME);
 	float Progress = SCREEN_WIDTH * GrowAlpha;
 
 	DrawText(
@@ -82,21 +74,28 @@ void Game::DrawProgressBar()
 		16,
 		WHITE);
 
-	DrawRectangle(0, 0, Progress, 20, WHITE);
+	DrawRectangle(0, 0, (int)Progress, 20, WHITE);
 }
 
+// Dibujar rectangulos a la izquierda
 void Game::DrawMovingYRectanglesLeft(int quantity)
 {
-	if (quantity == 0)
+
+	// TODO: Preguntar una mejor manera de usar la misma function con static 
+	// Guardo un array de anchos y altos y 
+	// Itero entre ellos y los voy modificando si han pasado la pantalla
+	if (quantity == 0) {
 		return;
-	static int *WidthsLeft = GetInitialWidthsLeft(quantity);
-	static int *HeightsLeft = GetInitialHeightsLeft(quantity);
-	static Color *RectangleColorsLeft = GetRandomColorsLeft(quantity);
+	}
+
+	static int* WidthsLeft = GetInitialWidthsLeft(quantity);
+	static int* HeightsLeft = GetInitialHeightsLeft(quantity);
+	static Color* RectangleColorsLeft = GetRandomColorsLeft(quantity);
 
 	for (int i = 0; i < quantity; i++)
 	{
 
-		static int *YPositionsLeft = GetInitialYPointsLeft(quantity, HeightsLeft[i]);
+		static int* YPositionsLeft = GetInitialYPointsLeft(quantity, HeightsLeft[i]);
 
 		if (SCREEN_HEIGHT <= YPositionsLeft[i])
 		{
@@ -107,7 +106,7 @@ void Game::DrawMovingYRectanglesLeft(int quantity)
 		}
 		else
 		{
-			YPositionsLeft[i] += LEVEL_ACCELERATION;
+			YPositionsLeft[i] += (int)LEVEL_ACCELERATION;
 		}
 
 		DrawRectangle(
@@ -119,19 +118,19 @@ void Game::DrawMovingYRectanglesLeft(int quantity)
 	}
 }
 
+// Dibujar rectangulos a la derecha
 void Game::DrawMovingYRectanglesRight(int quantity)
 {
 	if (quantity == 0)
 		return;
-	// int rectHeight = 300;
-	static int *Widths = GetInitialWidths(quantity);
-	static int *Heights = GetInitialHeights(quantity);
-	static Color *RectangleColors = GetRandomColors(quantity);
+	static int* Widths = GetInitialWidths(quantity);
+	static int* Heights = GetInitialHeights(quantity);
+	static Color* RectangleColors = GetRandomColors(quantity);
 
 	for (int i = 0; i < quantity; i++)
 	{
 
-		static int *YPositions = GetInitialYPoints(quantity, Heights[i]);
+		static int* YPositions = GetInitialYPoints(quantity, Heights[i]);
 
 		if (SCREEN_HEIGHT <= YPositions[i])
 		{
@@ -142,7 +141,7 @@ void Game::DrawMovingYRectanglesRight(int quantity)
 		}
 		else
 		{
-			YPositions[i] += LEVEL_ACCELERATION;
+			YPositions[i] += (int)LEVEL_ACCELERATION;
 		}
 
 		DrawRectangle(
@@ -154,10 +153,10 @@ void Game::DrawMovingYRectanglesRight(int quantity)
 	}
 }
 
-int *Game::GetInitialYPointsLeft(int quantity, int height)
+int* Game::GetInitialYPointsLeft(int quantity, int height)
 {
 
-	static int *RectangleYPositions = new int[quantity];
+	static int* RectangleYPositions = new int[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
@@ -167,10 +166,10 @@ int *Game::GetInitialYPointsLeft(int quantity, int height)
 	return RectangleYPositions;
 }
 
-int *Game::GetInitialWidthsLeft(int quantity)
+int* Game::GetInitialWidthsLeft(int quantity)
 {
 
-	static int *WidthsLeft = new int[quantity];
+	static int* WidthsLeft = new int[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
@@ -180,10 +179,10 @@ int *Game::GetInitialWidthsLeft(int quantity)
 	return WidthsLeft;
 }
 
-int *Game::GetInitialHeightsLeft(int quantity)
+int* Game::GetInitialHeightsLeft(int quantity)
 {
 
-	static int *HeightsLeft = new int[quantity];
+	static int* HeightsLeft = new int[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
@@ -193,10 +192,10 @@ int *Game::GetInitialHeightsLeft(int quantity)
 	return HeightsLeft;
 }
 
-Color *Game::GetRandomColorsLeft(int quantity)
+Color* Game::GetRandomColorsLeft(int quantity)
 {
 
-	static Color *RandomColorsLeft = new Color[quantity];
+	static Color* RandomColorsLeft = new Color[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
@@ -206,10 +205,10 @@ Color *Game::GetRandomColorsLeft(int quantity)
 	return RandomColorsLeft;
 }
 
-int *Game::GetInitialYPoints(int quantity, int height)
+int* Game::GetInitialYPoints(int quantity, int height)
 {
 
-	static int *RectangleYPositionsLeft = new int[quantity];
+	static int* RectangleYPositionsLeft = new int[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
@@ -219,10 +218,10 @@ int *Game::GetInitialYPoints(int quantity, int height)
 	return RectangleYPositionsLeft;
 }
 
-int *Game::GetInitialWidths(int quantity)
+int* Game::GetInitialWidths(int quantity)
 {
 
-	static int *Widths = new int[quantity];
+	static int* Widths = new int[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
@@ -232,10 +231,10 @@ int *Game::GetInitialWidths(int quantity)
 	return Widths;
 }
 
-int *Game::GetInitialHeights(int quantity)
+int* Game::GetInitialHeights(int quantity)
 {
 
-	static int *Hegiths = new int[quantity];
+	static int* Hegiths = new int[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
@@ -245,10 +244,10 @@ int *Game::GetInitialHeights(int quantity)
 	return Hegiths;
 }
 
-Color *Game::GetRandomColors(int quantity)
+Color* Game::GetRandomColors(int quantity)
 {
 
-	static Color *RandomColors = new Color[quantity];
+	static Color* RandomColors = new Color[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
@@ -258,115 +257,9 @@ Color *Game::GetRandomColors(int quantity)
 	return RandomColors;
 }
 
-// void Game::DrawMovingYRectangles(int quantity) {
-//
-//	int RectangleWidth = 100;
-//	int RectangleHeight = 300;
-//	int RectangleXPosition = 0;
-//  TODO: Preguntar como se hace un array dinamico que solo se setee 1 vez
-//	static int RectangleYPositions[4] = { -300, -600, -900, -1200 };
-//
-//	Color Colors[4] = { YELLOW, ORANGE, RED, GREEN };
-//
-//	static Color RectangleColors[4] = {
-//		Colors[GetRandomValue(0,3)],
-//		Colors[GetRandomValue(0,3)],
-//		Colors[GetRandomValue(0,3)],
-//		Colors[GetRandomValue(0,3)]
-//	};
-//
-//	for (int i = 0; i < 3; i++) {
-//
-//		if (SCREEN_HEIGHT <= RectangleYPositions[i]) {
-//			RectangleYPositions[i] = -RectangleHeight;
-//			RectangleColors[i] = Colors[GetRandomValue(0, 3)];
-//		}
-//		else {
-//			RectangleYPositions[i] += LEVEL_ACCELERATION;
-//		}
-//
-//		DrawRectangle(
-//			RectangleXPosition,
-//			RectangleYPositions[i],
-//			RectangleWidth,
-//			RectangleHeight,
-//			Colors[i]
-//		);
-//	}
-//
-//}
-
 void Game::MoveLevel()
 {
-	LevelPosY += LEVEL_ACCELERATION;
-}
-
-void Game::Move()
-{
-
-	int MoveValue = (int)Velocity * Acceleration;
-
-	if (IsKeyDown(KEY_W))
-	{
-		vehiclePosition.y -= IsLimitedTop()
-								 ? 0
-								 : MoveValue;
-	}
-	if (IsKeyDown(KEY_S))
-	{
-		vehiclePosition.y += IsLimitedBottom()
-								 ? 0
-								 : MoveValue;
-	}
-	if (IsKeyDown(KEY_D))
-	{
-		vehiclePosition.x += IsLimitedRight()
-								 ? 0
-								 : MoveValue;
-	}
-	if (IsKeyDown(KEY_A))
-	{
-		vehiclePosition.x -= IsLimitedLeft()
-								 ? 0
-								 : MoveValue;
-	}
-
-	Accelerate();
-}
-
-void Game::Accelerate()
-{
-	if (IsKeyDown(KEY_LEFT_SHIFT))
-	{
-		Acceleration += Acceleration < MAX_ACCELERATION ? 0.1f : 0.0f;
-	}
-	else
-		ResetAcceleration();
-}
-
-void Game::ResetAcceleration()
-{
-	Acceleration = InitialAcceleration;
-}
-
-bool Game::IsLimitedRight()
-{
-	return vehiclePosition.x >= SCREEN_WIDTH - SCREEN_MARGIN_BOTTOM_RIGHT;
-}
-
-bool Game::IsLimitedLeft()
-{
-	return vehiclePosition.x <= SCREEN_MARGIN_TOP_LEFT;
-}
-
-bool Game::IsLimitedTop()
-{
-	return vehiclePosition.y <= (SCREEN_MARGIN_TOP_LEFT);
-}
-
-bool Game::IsLimitedBottom()
-{
-	return vehiclePosition.y >= SCREEN_HEIGHT - (SCREEN_MARGIN_BOTTOM_RIGHT);
+	LevelPosY += (int)LEVEL_ACCELERATION;
 }
 
 Color Game::GetRandomColor()
