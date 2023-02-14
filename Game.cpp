@@ -30,6 +30,7 @@ void Game::Start()
 
 		PLAYER.Spawn();
 		PLAYER.ListenMovementInputs();
+		PLAYER.ListenShootInput();
 		PLAYER.ListenAccelerateInput();
 
 		ENEMY.SpawnVehicle();

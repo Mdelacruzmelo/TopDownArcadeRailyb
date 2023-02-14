@@ -51,6 +51,35 @@ void PlayerController::ListenMovementInputs()
 	character->Move(inputValues);
 }
 
+void PlayerController::ListenShootInput()
+{
+	static bool startedShoot = false;
+	static int bulletRate = 0;
+
+	bulletRate += 1;
+
+	if (bulletRate >= character->bulletRate) {
+		bulletRate = 0;
+		startedShoot = false;
+	}
+
+	if (IsKeyDown(KEY_SPACE))
+	{
+		if (!startedShoot) {
+			startedShoot = true;
+			bulletRate = 1;
+			character->shoots += 1;
+			character->ammunition -= 1;
+		}
+		else if (bulletRate == 0) {
+			character->shoots += 1;
+			character->ammunition -= 1;
+		}
+	}
+
+	character->Shoot();
+
+}
 
 void PlayerController::Spawn() {
 	character->Draw();

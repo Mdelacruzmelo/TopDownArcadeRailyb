@@ -8,7 +8,16 @@ public:
 		Vector2 PositionInput,
 		Vector2 DirectionInput,
 		BasicCharacter* TargetInput,
-		int quantity
+		int quantity,
+		int shoots,
+		int velocity
+	);
+	Bullet(
+		Vector2 PositionInput,
+		Vector2 DirectionInput,
+		int quantity,
+		int shoots,
+		int velocity
 	);
 
 	int BulletVelocity = 5;

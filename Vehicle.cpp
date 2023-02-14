@@ -39,10 +39,28 @@ void Vehicle::Draw(Vector2 Position)
 
 void Vehicle::Shoot()
 {
-	static Bullet* bullets[1000];
 	Vector2 OriginBullet = Vector2{ Position.x, (Position.y + Size.y) };
 	Vector2 DirectionBullet = Vector2{ 0.f, 1.f };
-	Bullet(OriginBullet, DirectionBullet, Target, 1000);
+	static int bulletRate = 0;
+	static int ammunition = 1000;
+	static int shoots = 1;
+	static int bulletVelocity = 10;
+
+	bulletRate += 1;
+
+	if (bulletRate >= 80) {
+		bulletRate = 0;
+		shoots++;
+	}
+
+	Bullet(
+		OriginBullet,
+		DirectionBullet,
+		Target,
+		ammunition,
+		shoots,
+		bulletVelocity
+	);
 }
 
 void Vehicle::Move()
