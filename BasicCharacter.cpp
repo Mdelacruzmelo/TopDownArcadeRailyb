@@ -1,6 +1,10 @@
 #include "BasicCharacter.h"
 #include "raymath.h"
 
+BasicCharacter::BasicCharacter() {
+
+}
+
 BasicCharacter::BasicCharacter(
 	int limitTop,
 	int limitRight,

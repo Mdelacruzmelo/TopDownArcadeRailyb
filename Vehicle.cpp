@@ -1,4 +1,5 @@
 #include "Vehicle.h"
+#include "Bullet.h"
 
 Vehicle::Vehicle(E_VehicleType Type)
 {
@@ -36,8 +37,50 @@ void Vehicle::Draw(Vector2 Position)
 	DrawRectangle((int)Position.x, (int)Position.y, (int)Size.x, (int)Size.y, WHITE);
 }
 
+void Vehicle::Shoot()
+{
+	static Bullet* bullets[1000];
+	Vector2 OriginBullet = Vector2{ Position.x, (Position.y + Size.y) };
+	Vector2 DirectionBullet = Vector2{ 0.f, 1.f };
+	Bullet(OriginBullet, DirectionBullet, Target, 1000);
+}
+
+void Vehicle::Move()
+{
+	if (bIsGoingRight) {
+		Position.x += Velocity * 1;
+		if (Position.x >= TargetLocation.x) SetNextTargetLocation();
+	}
+	else {
+		Position.x -= Velocity * 1;
+		if (Position.x <= TargetLocation.x) SetNextTargetLocation();
+	}
+}
+
+void Vehicle::SetNextTargetLocation()
+{
+	if (bIsGoingRight) {
+		bIsGoingRight = false;
+		TargetLocation.x = GetRandomValue(100, 400);
+	}
+	else {
+		bIsGoingRight = true;
+		TargetLocation.x = GetRandomValue(500, 800);
+	}
+}
+
+void Vehicle::SetTarget(BasicCharacter* TargetInput)
+{
+	Target = TargetInput;
+}
+
 void Vehicle::Draw()
 {
-	Vector2 Position = { 0, 0 };
-	DrawRectangle((int)Position.x, (int)Position.y, (int)Size.x, (int)Size.y, WHITE);
+	DrawRectangle(
+		(int)Position.x,
+		(int)Position.y,
+		(int)Size.x,
+		(int)Size.y,
+		GREEN
+	);
 }

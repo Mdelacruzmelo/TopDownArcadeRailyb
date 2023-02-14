@@ -6,13 +6,14 @@ class BasicCharacter
 {
 public:
 
+	BasicCharacter();
 	BasicCharacter(
 		int limitTop,
 		int limitRight,
 		int limitBottom,
 		int limitLeft
 	);
-	Vector2 Position = Vector2{ 120, 120 };
+	Vector2 Position = Vector2{ 520, 540 };
 
 	int screenLimitTop;
 	int screenLimitRight;
