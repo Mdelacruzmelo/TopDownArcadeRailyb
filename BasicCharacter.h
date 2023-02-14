@@ -20,6 +20,11 @@ public:
 	int screenLimitBottom;
 	int screenLimitLeft;
 
+	int ammunition = 1000;
+	int shoots = 0;
+	int bulletVelocity = 20;
+	int bulletRate = 30;
+
 	void Move(Vector2 inputValues);
 	void Accelerate(bool active);
 	void ResetAcceleration();
@@ -34,8 +39,8 @@ public:
 	bool IsLimitedTop();
 	bool IsLimitedBottom();
 	void Draw();
-
-	// Setters
+	void Shoot();
 	void SetSize(Vector2 size);
+
 	Vector2 Size = { 20.f, 20.f };
 };

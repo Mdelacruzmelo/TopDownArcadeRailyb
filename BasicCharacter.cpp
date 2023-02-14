@@ -1,4 +1,5 @@
 #include "BasicCharacter.h"
+#include "Bullet.h"
 #include "raymath.h"
 
 BasicCharacter::BasicCharacter() {
@@ -105,8 +106,20 @@ void BasicCharacter::Draw()
 		WHITE);
 }
 
-// Setters
 void BasicCharacter::SetSize(Vector2 size)
 {
 	Size = size;
+}
+
+void BasicCharacter::Shoot()
+{
+	Vector2 OriginBullet = Vector2{ Position.x, (Position.y + Size.y) };
+	Vector2 DirectionBullet = Vector2{ 0.f, -1.f };
+	new Bullet(
+		OriginBullet,
+		DirectionBullet,
+		ammunition,
+		shoots,
+		bulletVelocity
+	);
 }

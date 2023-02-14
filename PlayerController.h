@@ -14,8 +14,9 @@ public:
 
 	BasicCharacter* character;
 	void Spawn();
-	virtual void ListenMovementInputs();
 	virtual void ListenAccelerateInput();
+	virtual void ListenMovementInputs();
+	virtual void ListenShootInput();
 	
 	BasicCharacter* getCharacter();
 };
