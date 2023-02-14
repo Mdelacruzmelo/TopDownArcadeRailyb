@@ -16,4 +16,6 @@ public:
 	void Spawn();
 	virtual void ListenMovementInputs();
 	virtual void ListenAccelerateInput();
+	
+	BasicCharacter* getCharacter();
 };

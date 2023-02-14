@@ -1,4 +1,5 @@
 #include "Vehicle.h"
+#include "Bullet.h"
 
 Vehicle::Vehicle(E_VehicleType Type)
 {
@@ -38,7 +39,10 @@ void Vehicle::Draw(Vector2 Position)
 
 void Vehicle::Shoot()
 {
-
+	static Bullet* bullets[1000];
+	Vector2 OriginBullet = Vector2{ Position.x, (Position.y + Size.y) };
+	Vector2 DirectionBullet = Vector2{ 0.f, 1.f };
+	Bullet(OriginBullet, DirectionBullet, Target, 1000);
 }
 
 void Vehicle::Move()
@@ -57,12 +61,17 @@ void Vehicle::SetNextTargetLocation()
 {
 	if (bIsGoingRight) {
 		bIsGoingRight = false;
-		TargetLocation.x = 100;
+		TargetLocation.x = GetRandomValue(100, 400);
 	}
 	else {
 		bIsGoingRight = true;
-		TargetLocation.x = 400;
+		TargetLocation.x = GetRandomValue(500, 800);
 	}
+}
+
+void Vehicle::SetTarget(BasicCharacter* TargetInput)
+{
+	Target = TargetInput;
 }
 
 void Vehicle::Draw()

@@ -7,7 +7,7 @@
 class AIController : public Controller
 {
 public:
-	AIController();
+	AIController(BasicCharacter* TargetInput);
 
 	int SCREEN_WIDTH = 1080;
 	int SCREEN_HEIGHT = 720;
@@ -20,4 +20,5 @@ public:
 	Vehicle VehicleHeavy = Vehicle(VEHICLE_HEAVY);
 	Vehicle VehicleLight = Vehicle(VEHICLE_LIGHT);
 
+	BasicCharacter* Target;
 };

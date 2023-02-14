@@ -4,25 +4,14 @@
 
 class Bullet {
 public:
-
 	Bullet(
 		Vector2 PositionInput,
 		Vector2 DirectionInput,
-		BasicCharacter* TargetInput
+		BasicCharacter* TargetInput,
+		int quantity
 	);
 
-	Vector2 Direction = { 0.f, 0.f };
-	Vector2 Position = { 0.f, 0.f };
-	Vector2 Size = { 20.f, 20.f };
+	int BulletVelocity = 5;
+	Vector2 Size = { 8.f, 25.f };
 	BasicCharacter* Target;
-
-	bool spawned = false;
-	bool impacted = false;
-	bool destroyed = false;
-
-	void Impact();
-	void Move();
-
-	void Draw();
-
 };

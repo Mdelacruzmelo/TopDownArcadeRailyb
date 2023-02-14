@@ -20,27 +20,10 @@ public:
 
 private:
 
-	void MoveLevel();
 	void DrawLevel();
 	void DrawProgressBar();
-
-	void DrawMovingYRectanglesLeft(int quantity);
-	void DrawMovingYRectanglesRight(int quantity);
-
-	int* GetInitialYPointsLeft(int initY, int height);
-	int* GetInitialYPoints(int initY, int height);
-
-	int* GetInitialWidths(int initY);
-	int* GetInitialWidthsLeft(int initY);
-
-	int* GetInitialHeightsLeft(int initY);
-	int* GetInitialHeights(int initY);
-
-	Color* GetRandomColorsLeft(int initY);
-	Color* GetRandomColors(int initY);
-
+	void DrawMovingYRectangles(int quantity);
 	Color GetRandomColor();
-
 	Color Colors[11] = {
 		LIGHTGRAY,
 		GRAY,

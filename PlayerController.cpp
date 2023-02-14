@@ -22,6 +22,11 @@ void PlayerController::ListenAccelerateInput()
 	character->Accelerate(buttonPressed);
 }
 
+BasicCharacter* PlayerController::getCharacter()
+{
+	return character;
+}
+
 void PlayerController::ListenMovementInputs()
 {
 	static Vector2 inputValues = { 0, 0 };

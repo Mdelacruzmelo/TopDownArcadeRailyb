@@ -13,7 +13,7 @@ public:
 		int limitBottom,
 		int limitLeft
 	);
-	Vector2 Position = Vector2{ 120, 120 };
+	Vector2 Position = Vector2{ 520, 540 };
 
 	int screenLimitTop;
 	int screenLimitRight;

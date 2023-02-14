@@ -20,7 +20,8 @@ void Game::Start()
 	InitAudioDevice();
 
 	PlayerController PLAYER = PlayerController();
-	AIController ENEMY = AIController();
+	BasicCharacter* EnemyTarget = PLAYER.getCharacter();
+	AIController ENEMY = AIController(EnemyTarget);
 
 	while (!WindowShouldClose())
 	{
@@ -33,9 +34,7 @@ void Game::Start()
 
 		ENEMY.SpawnVehicle();
 
-		// DrawLevel();
-		// MoveLevel();
-
+		DrawLevel();
 		EndDrawing();
 	}
 
@@ -45,8 +44,8 @@ void Game::Start()
 
 void Game::DrawLevel()
 {
-	DrawMovingYRectanglesLeft(4);
-	DrawMovingYRectanglesRight(3);
+	LevelPosY += (int)LEVEL_ACCELERATION;
+	DrawMovingYRectangles(4);
 	DrawProgressBar();
 }
 
@@ -71,189 +70,89 @@ void Game::DrawProgressBar()
 	DrawRectangle(0, 0, (int)Progress, 20, WHITE);
 }
 
-// Dibujar rectangulos a la izquierda
-void Game::DrawMovingYRectanglesLeft(int quantity)
+void Game::DrawMovingYRectangles(int quantity)
 {
+	if (quantity == 0) return;
 
-	// TODO: Preguntar una mejor manera de usar la misma function con static 
-	// Guardo un array de anchos y altos y 
-	// Itero entre ellos y los voy modificando si han pasado la pantalla
-	if (quantity == 0) {
-		return;
-	}
-
-	static int* WidthsLeft = GetInitialWidthsLeft(quantity);
-	static int* HeightsLeft = GetInitialHeightsLeft(quantity);
-	static Color* RectangleColorsLeft = GetRandomColorsLeft(quantity);
-
-	for (int i = 0; i < quantity; i++)
-	{
-
-		static int* YPositionsLeft = GetInitialYPointsLeft(quantity, HeightsLeft[i]);
-
-		if (SCREEN_HEIGHT <= YPositionsLeft[i])
-		{
-			RectangleColorsLeft[i] = GetRandomColor();
-			WidthsLeft[i] = GetRandomValue(100, 310);
-			HeightsLeft[i] = GetRandomValue(300, 500);
-			YPositionsLeft[i] = -HeightsLeft[i];
-		}
-		else
-		{
-			YPositionsLeft[i] += (int)LEVEL_ACCELERATION;
-		}
-
-		DrawRectangle(
-			0,
-			YPositionsLeft[i],
-			WidthsLeft[i],
-			HeightsLeft[i],
-			RectangleColorsLeft[i]);
-	}
-}
-
-// Dibujar rectangulos a la derecha
-void Game::DrawMovingYRectanglesRight(int quantity)
-{
-	if (quantity == 0)
-		return;
-	static int* Widths = GetInitialWidths(quantity);
-	static int* Heights = GetInitialHeights(quantity);
-	static Color* RectangleColors = GetRandomColors(quantity);
-
-	for (int i = 0; i < quantity; i++)
-	{
-
-		static int* YPositions = GetInitialYPoints(quantity, Heights[i]);
-
-		if (SCREEN_HEIGHT <= YPositions[i])
-		{
-			RectangleColors[i] = GetRandomColor();
-			Widths[i] = GetRandomValue(100, 310);
-			Heights[i] = GetRandomValue(300, 500);
-			YPositions[i] = -Heights[i];
-		}
-		else
-		{
-			YPositions[i] += (int)LEVEL_ACCELERATION;
-		}
-
-		DrawRectangle(
-			SCREEN_WIDTH - Widths[i],
-			YPositions[i],
-			Widths[i],
-			Heights[i],
-			RectangleColors[i]);
-	}
-}
-
-int* Game::GetInitialYPointsLeft(int quantity, int height)
-{
-
-	static int* RectangleYPositions = new int[quantity];
-
-	for (int i = 0; i < quantity; i++)
-	{
-		RectangleYPositions[i] = -height * (i + 1);
-	}
-
-	return RectangleYPositions;
-}
-
-int* Game::GetInitialWidthsLeft(int quantity)
-{
+	// Draw rectangles on the left side 
 
 	static int* WidthsLeft = new int[quantity];
-
-	for (int i = 0; i < quantity; i++)
-	{
-		WidthsLeft[i] = GetRandomValue(100, 250);
-	}
-
-	return WidthsLeft;
-}
-
-int* Game::GetInitialHeightsLeft(int quantity)
-{
-
 	static int* HeightsLeft = new int[quantity];
+	static Color* RectangleColorsLeft = new Color[quantity];
+	static bool* startedLeft = new bool[quantity];
+	static int* YPositionsLeft = new int[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
-		HeightsLeft[i] = GetRandomValue(300, 500);
+		if (startedLeft[i] != true) {
+
+			WidthsLeft[i] = GetRandomValue(100, 250);
+			HeightsLeft[i] = GetRandomValue(300, 500);
+			RectangleColorsLeft[i] = GetRandomColor();
+			startedLeft[i] = true;
+			YPositionsLeft[i] = -HeightsLeft[i] * (i + 1);
+		}
+		else {
+
+			if (SCREEN_HEIGHT <= YPositionsLeft[i])
+			{
+				RectangleColorsLeft[i] = GetRandomColor();
+				WidthsLeft[i] = GetRandomValue(100, 310);
+				HeightsLeft[i] = GetRandomValue(300, 500);
+				YPositionsLeft[i] = -HeightsLeft[i];
+			}
+			else YPositionsLeft[i] += (int)LEVEL_ACCELERATION;
+
+			DrawRectangle(
+				0,
+				YPositionsLeft[i],
+				WidthsLeft[i],
+				HeightsLeft[i],
+				RectangleColorsLeft[i]);
+
+		}
 	}
 
-	return HeightsLeft;
-}
+	// Draw rectangles on the right side 
 
-Color* Game::GetRandomColorsLeft(int quantity)
-{
-
-	static Color* RandomColorsLeft = new Color[quantity];
+	static int* WidthsRight = new int[quantity];
+	static int* HeightsRight = new int[quantity];
+	static Color* RectangleColorsRight = new Color[quantity];
+	static bool* startedRight = new bool[quantity];
+	static int* YPositionsRight = new int[quantity];
 
 	for (int i = 0; i < quantity; i++)
 	{
-		RandomColorsLeft[i] = GetRandomColor();
+		if (startedRight[i] != true) {
+
+			WidthsRight[i] = GetRandomValue(100, 250);
+			HeightsRight[i] = GetRandomValue(300, 500);
+			RectangleColorsRight[i] = GetRandomColor();
+			startedRight[i] = true;
+			YPositionsRight[i] = -HeightsRight[i] * (i + 1);
+
+		}
+		else {
+
+			if (SCREEN_HEIGHT <= YPositionsRight[i])
+			{
+				RectangleColorsRight[i] = GetRandomColor();
+				WidthsRight[i] = GetRandomValue(100, 310);
+				HeightsRight[i] = GetRandomValue(300, 500);
+				YPositionsRight[i] = -HeightsRight[i];
+			}
+			else YPositionsRight[i] += (int)LEVEL_ACCELERATION;
+
+			DrawRectangle(
+				SCREEN_WIDTH - WidthsRight[i],
+				YPositionsRight[i],
+				WidthsRight[i],
+				HeightsRight[i],
+				RectangleColorsRight[i]);
+		}
+
 	}
 
-	return RandomColorsLeft;
-}
-
-int* Game::GetInitialYPoints(int quantity, int height)
-{
-
-	static int* RectangleYPositionsLeft = new int[quantity];
-
-	for (int i = 0; i < quantity; i++)
-	{
-		RectangleYPositionsLeft[i] = -height * (i + 1);
-	}
-
-	return RectangleYPositionsLeft;
-}
-
-int* Game::GetInitialWidths(int quantity)
-{
-
-	static int* Widths = new int[quantity];
-
-	for (int i = 0; i < quantity; i++)
-	{
-		Widths[i] = GetRandomValue(100, 250);
-	}
-
-	return Widths;
-}
-
-int* Game::GetInitialHeights(int quantity)
-{
-
-	static int* Hegiths = new int[quantity];
-
-	for (int i = 0; i < quantity; i++)
-	{
-		Hegiths[i] = GetRandomValue(300, 500);
-	}
-
-	return Hegiths;
-}
-
-Color* Game::GetRandomColors(int quantity)
-{
-
-	static Color* RandomColors = new Color[quantity];
-
-	for (int i = 0; i < quantity; i++)
-	{
-		RandomColors[i] = GetRandomColor();
-	}
-
-	return RandomColors;
-}
-
-void Game::MoveLevel()
-{
-	LevelPosY += (int)LEVEL_ACCELERATION;
 }
 
 Color Game::GetRandomColor()
