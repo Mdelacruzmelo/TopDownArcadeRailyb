@@ -1,31 +1,33 @@
 #include "Bullet.h"
 #include "raymath.h"
 
+Bullet::Bullet() {
+}
+
 Bullet::Bullet(
-	Vector2 PositionInput,
+	Vector2 OriginInput,
 	Vector2 Direction,
 	BasicCharacter* TargetInput,
 	int quantity,
 	int bulletShoots,
-	int velocity
+	int velocity,
+	int damage
 )
 {
-
-
-
 	if (quantity > 0 && bulletShoots <= quantity) {
 
 		Target = TargetInput;
+		static int bulletDamage = damage;
 		static Vector2* Positions = new Vector2[quantity];
 		static bool* impacted = new bool[quantity];
 		static bool* shooted = new bool[quantity];
 		static Sound shootSound = LoadSound("resources/gunShoot.wav");
-		static Sound impactSound = LoadSound("resources/gunImpact.wav");
+		static Sound impactSound = LoadSound("resources/bulletImpact.wav");
 		static bool setOnce = false;
 
 		if (!setOnce) {
 
-			SetSoundVolume(shootSound, 0.5);
+			SetSoundVolume(shootSound, 0.2);
 			SetSoundVolume(impactSound, 0.5);
 			setOnce = true;
 
@@ -36,8 +38,9 @@ Bullet::Bullet(
 			if (shooted[i] != true) {
 
 				PlaySound(shootSound);
-				Positions[i] = PositionInput;
+				Positions[i] = OriginInput;
 				shooted[i] = true;
+
 			}
 
 			if (impacted[i] != true) {
@@ -66,13 +69,14 @@ Bullet::Bullet(
 					bIsInVeticalRange = true;
 				}
 
-				if (Positions[i].y >= 800) {
+				if (Positions[i].y >= 800 || Positions[i].y < 0) {
 					impacted[i] = true;
 				}
 
 				if (bIsInHorizontalRange && bIsInVeticalRange) {
 					if (impacted[i] != true) {
 						PlaySound(impactSound);
+						Target->HealthComp.ApplyDamage(bulletDamage);
 						impacted[i] = true;
 					}
 				}
@@ -82,11 +86,13 @@ Bullet::Bullet(
 }
 
 Bullet::Bullet(
-	Vector2 PositionInput,
+	Vector2 OriginInput,
 	Vector2 Direction,
 	int quantity,
 	int bulletShoots,
-	int velocity
+	int velocity,
+	Vector2 VehiclePosition,
+	HealthComponent* HealthCompInput
 )
 {
 	if (quantity > 0 && bulletShoots <= quantity) {
@@ -94,23 +100,21 @@ Bullet::Bullet(
 		static Vector2* Positions = new Vector2[quantity];
 		static bool* impacted = new bool[quantity];
 		static bool* shooted = new bool[quantity];
-		static Sound shootSound = LoadSound("resources/gunShoot.wav");
-		static Sound impactSound = LoadSound("resources/gunImpact.wav");
+		static Sound shootSound = LoadSound("resources/gunLaserShoot.wav");
+		static Sound impactSound = LoadSound("resources/bulletImpact.wav");
 		static bool setOnce = false;
 
 		for (int i = 0; i < bulletShoots; i++) {
 
 			if (!setOnce) {
-
 				SetSoundVolume(shootSound, 0.5);
 				SetSoundVolume(impactSound, 0.5);
 				setOnce = true;
-
 			}
 
 			if (shooted[i] != true) {
 				PlaySound(shootSound);
-				Positions[i] = PositionInput;
+				Positions[i] = OriginInput;
 				shooted[i] = true;
 			}
 
@@ -130,23 +134,20 @@ Bullet::Bullet(
 				bool bIsInHorizontalRange = false;
 				bool bIsInVeticalRange = false;
 
-				/*if ((Positions[i].x + 20) >= Target->Position.x &&
-					(Positions[i].x - 20) <= Target->Position.x) {
-					bIsInHorizontalRange = true;
-				}
+				bool collision = CheckCollisionRecs(
+					Rectangle{ Positions[i].x, Positions[i].y, Size.x, Size.y },
+					Rectangle{ VehiclePosition.x, VehiclePosition.y, 40,60 }
+				);
 
-				if ((Positions[i].y + 20) >= Target->Position.y &&
-					(Positions[i].y - 20) <= Target->Position.y) {
-					bIsInVeticalRange = true;
-				}*/
-
-				if (Positions[i].y >= 800) {
+				// Get out of the screen
+				if (Positions[i].y >= 800 || Positions[i].y < 0) {
 					impacted[i] = true;
 				}
 
-				if (bIsInHorizontalRange && bIsInVeticalRange) {
+				if (collision) {
 					if (impacted[i] != true) {
 						PlaySound(impactSound);
+						HealthCompInput->ApplyDamage(10);
 						impacted[i] = true;
 					}
 				}
