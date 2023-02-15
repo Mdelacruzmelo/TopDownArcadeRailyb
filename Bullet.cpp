@@ -56,24 +56,16 @@ Bullet::Bullet(
 					(int)Size.y,
 					RED);
 
-				bool bIsInHorizontalRange = false;
-				bool bIsInVeticalRange = false;
-
-				if ((Positions[i].x + 20) >= Target->Position.x &&
-					(Positions[i].x - 20) <= Target->Position.x) {
-					bIsInHorizontalRange = true;
-				}
-
-				if ((Positions[i].y + 20) >= Target->Position.y &&
-					(Positions[i].y - 20) <= Target->Position.y) {
-					bIsInVeticalRange = true;
-				}
-
 				if (Positions[i].y >= 800 || Positions[i].y < 0) {
 					impacted[i] = true;
 				}
 
-				if (bIsInHorizontalRange && bIsInVeticalRange) {
+				bool collision = CheckCollisionRecs(
+					Rectangle{ Positions[i].x, Positions[i].y, Size.x, Size.y },
+					Rectangle{ Target->Position.x, Target->Position.y, Target->Size.x, Target->Size.y }
+				);
+
+				if (collision) {
 					if (impacted[i] != true) {
 						PlaySound(impactSound);
 						Target->HealthComp.ApplyDamage(bulletDamage);
@@ -129,7 +121,7 @@ Bullet::Bullet(
 					(int)Positions[i].y,
 					(int)Size.x,
 					(int)Size.y,
-					RED);
+					BLUE);
 
 				bool bIsInHorizontalRange = false;
 				bool bIsInVeticalRange = false;
@@ -147,7 +139,7 @@ Bullet::Bullet(
 				if (collision) {
 					if (impacted[i] != true) {
 						PlaySound(impactSound);
-						HealthCompInput->ApplyDamage(10);
+						HealthCompInput->ApplyDamage(12310);
 						impacted[i] = true;
 					}
 				}

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 
+
 void Game::Start()
 {
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Game started");
@@ -13,9 +14,11 @@ void Game::Start()
 	InitAudioDevice();
 
 	PlayerController PlayerControl = PlayerController();
-	BasicCharacter* EnemyTarget = PlayerControl.getCharacter();
-	AIController EnemyControl = AIController(EnemyTarget);
+	BasicCharacter* Character = PlayerControl.getCharacter();
+
+	AIController EnemyControl = AIController(Character); // Set ref to our enemy
 	Vehicle* VehicleTarget = EnemyControl.getVehiclePawn();
+
 	PlayerControl.SetTarget(VehicleTarget);
 
 	while (!WindowShouldClose())
@@ -23,26 +26,64 @@ void Game::Start()
 		if (IsKeyPressed(KEY_Q)) paused = !paused;
 
 		BeginDrawing();
+
 		ClearBackground(BLACK);
-		DrawLevel();
 
-		PlayerControl.Spawn();
-		EnemyControl.SpawnVehicleStandard();
+		if (inMainMenu) DrawMainMenu();
+		else if (inLooseScreen) DrawLooseScreen();
+		else if (inControls) DrawControls();
+		else if (inSuccessScreen) DrawSuccessScreen();
+		else if (playing) {
 
-		if (paused) {
+			DrawLevel();
 
-			LEVEL_ACCELERATION = 0;
+			if (Character->HealthComp.GetHealth() <= 0 || ProgressBar >= 100) {
 
-		}
-		else {
+				SoundLooseTheme();
+				forceStopProgressBar = true;
 
-			LEVEL_ACCELERATION = INITIAL_LEVEL_ACCELERATION;
+				static int destroyTime = 0;
+				destroyTime += 1;
 
-			PlayerControl.ListenMovementInputs();
-			PlayerControl.ListenAccelerateInput();
-			PlayerControl.ListenShootInput(VehicleTarget->GetHealthComp());
+				if (destroyTime >= 100) {
+					if (ProgressBar >= 100) {
+						loosedByTime = true;
+					}
+					playing = false;
+					inLooseScreen = true;
+				}
+			}
+			else if (VehicleTarget->HealthComp.GetHealth() <= 0) {
 
-			EnemyControl.Play();
+				SoundSuccessTheme();
+				forceStopProgressBar = true;
+
+				static int enjoyTime = 0;
+				enjoyTime += 1;
+
+				if (enjoyTime >= 100) {
+					playing = false;
+					inSuccessScreen = true;
+				}
+
+			}
+
+			PlayerControl.Spawn();
+			EnemyControl.SpawnVehicleStandard();
+
+			if (paused) {
+				LEVEL_ACCELERATION = 0;
+				DrawPauseMenu();
+			}
+			else {
+				LEVEL_ACCELERATION = INITIAL_LEVEL_ACCELERATION;
+
+				PlayerControl.ListenMovementInputs();
+				PlayerControl.ListenAccelerateInput();
+				PlayerControl.ListenShootInput(VehicleTarget->GetHealthComp());
+
+				EnemyControl.Play();
+			}
 		}
 
 		EndDrawing();
@@ -52,28 +93,245 @@ void Game::Start()
 	CloseWindow();
 }
 
+void Game::DrawPauseMenu() {
+
+	DrawRectangle(
+		0,
+		0,
+		SCREEN_WIDTH,
+		SCREEN_HEIGHT,
+		Fade(BLACK, 0.5));
+
+	DrawText(
+		TextFormat("Pause"),
+		220,
+		405,
+		40,
+		WHITE);
+
+}
+
+void Game::DrawControls() {
+
+	LoadTimePassed += GetFrameTime();
+
+	float GrowAlpha = (float)(LoadTimePassed / LOADING_TIME);
+	float BarWidth = SCREEN_WIDTH * GrowAlpha;
+	LoadingBar = (int)((BarWidth * 100) / SCREEN_WIDTH);
+
+	DrawRectangle(0, 10, (int)BarWidth, 15, WHITE);
+
+	DrawText(
+		TextFormat("Loading: %d %", (int)LoadingBar),
+		20,
+		10,
+		15,
+		BLACK);
+	// Esto es un apanyo porque no sé como pintar "10%", solo pinta "10"
+	DrawText(
+		"%",
+		115,
+		10,
+		15,
+		BLACK);
+
+	DrawText(
+		TextFormat("Movement: A W S D \nShoot: SPACE\nSpeed: L Shift\nPause: Q"),
+		220,
+		405,
+		20,
+		WHITE);
+
+	DrawText(
+		TextFormat("Kill the enemy before the \nprogress bar goes to 100%"),
+		220,
+		205,
+		30,
+		WHITE);
+
+	// Skip button
+	DrawRectangle(
+		900,
+		600,
+		100,
+		40,
+		GRAY);
+
+	DrawText(
+		TextFormat("Skip"),
+		920,
+		605,
+		30,
+		BLACK);
+
+	if (
+		IsMouseButtonPressed(0) &&
+		GetMouseX() >= 900 &&
+		GetMouseX() <= (900 + 100) &&
+		GetMouseY() >= 600 &&
+		GetMouseY() <= (600 + 40)
+		) {
+		playing = true;
+		inControls = false;
+	}
+
+	if (LoadingBar >= 100) {
+		inControls = false;
+	}
+}
+
+void Game::DrawSuccessScreen() {
+
+	static int timeInSuccessScreen = 0;
+	timeInSuccessScreen += 1;
+
+	DrawRectangle(
+		0,
+		0,
+		SCREEN_WIDTH,
+		SCREEN_HEIGHT,
+		Fade(BLACK, 0.5));
+
+	DrawText(
+		TextFormat("You W-I-N !"),
+		220,
+		405,
+		40,
+		WHITE);
+
+	if (timeInSuccessScreen >= 150) {
+		CloseWindow();
+	}
+}
+
+void Game::DrawMainMenu()
+{
+	static int buttonPosX = 200;
+	static int buttonPosY = 400;
+	static int buttonWidth = 120;
+	static int buttonHeight = 40;
+
+	DrawRectangle(
+		buttonPosX,
+		buttonPosY,
+		buttonWidth,
+		buttonHeight,
+		WHITE);
+
+	DrawText(
+		TextFormat("Play"),
+		buttonPosX + 20,
+		buttonPosY + 5,
+		buttonHeight - 10,
+		BLACK);
+
+	if (
+		IsMouseButtonPressed(0) &&
+		GetMouseX() >= buttonPosX &&
+		GetMouseX() <= (buttonPosX + buttonWidth) &&
+		GetMouseY() >= buttonPosY &&
+		GetMouseY() <= (buttonPosY + buttonHeight)
+		) {
+		inControls = true;
+		playing = true;
+		inMainMenu = false;
+	}
+}
+
+void Game::SoundSuccessTheme() {
+
+	static bool setOnce = false;
+
+	if (!setOnce) {
+		successSound = LoadSound("resources/SuccessTheme.wav");
+		StopSound(levelSound);
+		SetSoundVolume(successSound, 0.6);
+		PlaySound(successSound);
+		setOnce = true;
+	}
+
+}
+
+void Game::SoundLooseTheme() {
+
+	static bool setOnce = false;
+
+	if (!setOnce) {
+		looseSound = LoadSound("resources/LooseTheme.wav");
+		StopSound(levelSound);
+		SetSoundVolume(looseSound, 0.5);
+		PlaySound(looseSound);
+		setOnce = true;
+	}
+
+}
+
+void Game::DrawLooseScreen()
+{
+	static int timeInLooseScreen = 0;
+	timeInLooseScreen += 1;
+
+	DrawRectangle(
+		0,
+		0,
+		SCREEN_WIDTH,
+		SCREEN_HEIGHT,
+		Fade(BLACK, 0.5));
+
+	if (loosedByTime) {
+		DrawText(
+			TextFormat("Time finished"),
+			220,
+			405,
+			40,
+			WHITE);
+	}
+	else {
+		DrawText(
+			TextFormat("You loose"),
+			220,
+			405,
+			40,
+			WHITE);
+	}
+
+	if (timeInLooseScreen >= 300) {
+		CloseWindow();
+	}
+}
+
 void Game::DrawLevel()
 {
+	static bool setOnce = false;
+
+	if (!setOnce) {
+		levelSound = LoadSound("resources/TetrisTheme.wav");
+
+		SetSoundVolume(levelSound, 0.05);
+		PlaySound(levelSound);
+		setOnce = true;
+	}
+
 	DrawMovingYRectangles(4);
 	DrawProgressBar();
 }
 
 void Game::DrawProgressBar()
 {
-	if (!paused) {
+	if (!paused && !forceStopProgressBar) {
 		TimePassed += GetFrameTime();
 	}
 
 	float GrowAlpha = (float)(TimePassed / LEVEL_TIME);
 	float BarWidth = SCREEN_WIDTH * GrowAlpha;
-	int Progress = (int)((BarWidth * 100) / SCREEN_WIDTH);
+	ProgressBar = (int)((BarWidth * 100) / SCREEN_WIDTH);
 
 	DrawRectangle(0, 0, SCREEN_WIDTH, 35, BLACK);
 
 	DrawRectangle(0, 10, (int)BarWidth, 15, WHITE);
 
 	DrawText(
-		TextFormat("Progress: %d %", (int)Progress),
+		TextFormat("Progress: %d %", (int)ProgressBar),
 		20,
 		10,
 		15,
