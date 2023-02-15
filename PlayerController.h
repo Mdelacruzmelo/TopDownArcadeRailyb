@@ -1,8 +1,9 @@
 #pragma once
 #include "Controller.h"
 #include "BasicCharacter.h"
+#include "Vehicle.h"
 
-class PlayerController : public Controller
+class PlayerController
 {
 public:
 	PlayerController();
@@ -13,10 +14,15 @@ public:
 	int SCREEN_MARGIN_BOTTOM_RIGHT = 50;
 
 	BasicCharacter* character;
+	BasicCharacter* getCharacter();
+	Vehicle* VehicleTarget = new Vehicle();
+
 	void Spawn();
+	void SetTarget(Vehicle* VehicleInput);
+
 	virtual void ListenAccelerateInput();
 	virtual void ListenMovementInputs();
-	virtual void ListenShootInput();
-	
-	BasicCharacter* getCharacter();
+	virtual void ListenShootInput(HealthComponent* HealthComp);
+
+	void ApplyDamage();
 };

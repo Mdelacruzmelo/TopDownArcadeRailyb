@@ -1,23 +1,29 @@
 #pragma once
 #include "raylib.h"
 #include "BasicCharacter.h"
+#include "Vehicle.h"
+#include "HealthComponent.h"
 
 class Bullet {
 public:
+	Bullet();
 	Bullet(
-		Vector2 PositionInput,
+		Vector2 OriginInput,
 		Vector2 DirectionInput,
 		BasicCharacter* TargetInput,
 		int quantity,
 		int shoots,
-		int velocity
+		int velocity,
+		int damage
 	);
 	Bullet(
-		Vector2 PositionInput,
+		Vector2 OriginInput,
 		Vector2 DirectionInput,
 		int quantity,
 		int shoots,
-		int velocity
+		int velocity,
+		Vector2 VehiclePosition,
+		HealthComponent* HealthCompInput
 	);
 
 	int BulletVelocity = 5;

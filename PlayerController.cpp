@@ -3,17 +3,8 @@
 
 PlayerController::PlayerController() {
 
-	int limitTop = SCREEN_MARGIN_TOP_LEFT;
-	int limitRight = SCREEN_WIDTH - SCREEN_MARGIN_BOTTOM_RIGHT;
-	int limitBottom = SCREEN_HEIGHT - SCREEN_MARGIN_BOTTOM_RIGHT;
-	int limitLeft = SCREEN_MARGIN_TOP_LEFT;
-
-	character = new BasicCharacter(
-		limitTop,
-		limitRight,
-		limitBottom,
-		limitLeft
-	);
+	VehicleTarget = new Vehicle();
+	character = new BasicCharacter();
 }
 
 void PlayerController::ListenAccelerateInput()
@@ -51,7 +42,7 @@ void PlayerController::ListenMovementInputs()
 	character->Move(inputValues);
 }
 
-void PlayerController::ListenShootInput()
+void PlayerController::ListenShootInput(HealthComponent* HealthCompInput)
 {
 	static bool startedShoot = false;
 	static int bulletRate = 0;
@@ -68,19 +59,30 @@ void PlayerController::ListenShootInput()
 		if (!startedShoot) {
 			startedShoot = true;
 			bulletRate = 1;
-			character->shoots += 1;
+			character->shots += 1;
 			character->ammunition -= 1;
 		}
 		else if (bulletRate == 0) {
-			character->shoots += 1;
+			character->shots += 1;
 			character->ammunition -= 1;
 		}
 	}
 
-	character->Shoot();
+	character->Shoot(VehicleTarget->Position, HealthCompInput);
 
 }
 
-void PlayerController::Spawn() {
+void PlayerController::ApplyDamage()
+{
+	VehicleTarget->HealthComp.ApplyDamage(100);
+}
+
+void PlayerController::Spawn()
+{
 	character->Draw();
+	character->CheckDestroy();
+}
+
+void PlayerController::SetTarget(Vehicle* VehicleInput) {
+	VehicleTarget = VehicleInput;
 }

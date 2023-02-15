@@ -1,3 +1,4 @@
+#pragma once
 #include "AIController.h"
 
 AIController::AIController(BasicCharacter* TargetInput) {
@@ -5,19 +6,22 @@ AIController::AIController(BasicCharacter* TargetInput) {
 	int limitRight = SCREEN_WIDTH - SCREEN_MARGIN_BOTTOM_RIGHT;
 	int limitBottom = SCREEN_HEIGHT - SCREEN_MARGIN_BOTTOM_RIGHT;
 	int limitLeft = SCREEN_MARGIN_TOP_LEFT;
-
 	Target = TargetInput;
 }
 
 
-void AIController::SpawnVehicle() {
-
+void AIController::SpawnVehicleStandard() {
 	VehicleStandard.Draw();
+}
+
+void AIController::Play() {
 	VehicleStandard.SetTarget(Target);
 	VehicleStandard.Move();
+	VehicleStandard.CheckDestroy();
 	VehicleStandard.Shoot();
+}
 
-	// VehicleHeavy.Draw(Vector2{ 370, 200 });
-	// VehicleHeavy.Draw(Vector2{ 500, 250 });
-	// VehicleLight.Draw(Vector2{ 200, 100 });
+Vehicle* AIController::getVehiclePawn()
+{
+	return &VehicleStandard;
 }

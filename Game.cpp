@@ -2,40 +2,49 @@
 #include "Vehicle.h"
 #include "PlayerController.h"
 #include "AIController.h"
+#include "HealthComponent.h"
 #include <iostream>
 #include <string>
 
-Game::Game()
-{
-	// vehiclePosition = {(float)SCREEN_WIDTH / 2, (float)SCREEN_HEIGHT / 2};
-	// Velocity = 2.0f;
-	// Acceleration = 1.0f;
-}
-
 void Game::Start()
 {
-
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Game started");
 	SetTargetFPS(60);
 	InitAudioDevice();
 
-	PlayerController PLAYER = PlayerController();
-	BasicCharacter* EnemyTarget = PLAYER.getCharacter();
-	AIController ENEMY = AIController(EnemyTarget);
+	PlayerController PlayerControl = PlayerController();
+	BasicCharacter* EnemyTarget = PlayerControl.getCharacter();
+	AIController EnemyControl = AIController(EnemyTarget);
+	Vehicle* VehicleTarget = EnemyControl.getVehiclePawn();
+	PlayerControl.SetTarget(VehicleTarget);
 
 	while (!WindowShouldClose())
 	{
+		if (IsKeyPressed(KEY_Q)) paused = !paused;
+
 		BeginDrawing();
 		ClearBackground(BLACK);
-
-		PLAYER.Spawn();
-		PLAYER.ListenMovementInputs();
-		PLAYER.ListenShootInput();
-		PLAYER.ListenAccelerateInput();
-
-		ENEMY.SpawnVehicle();
-
 		DrawLevel();
+
+		PlayerControl.Spawn();
+		EnemyControl.SpawnVehicleStandard();
+
+		if (paused) {
+
+			LEVEL_ACCELERATION = 0;
+
+		}
+		else {
+
+			LEVEL_ACCELERATION = INITIAL_LEVEL_ACCELERATION;
+
+			PlayerControl.ListenMovementInputs();
+			PlayerControl.ListenAccelerateInput();
+			PlayerControl.ListenShootInput(VehicleTarget->GetHealthComp());
+
+			EnemyControl.Play();
+		}
+
 		EndDrawing();
 	}
 
@@ -45,30 +54,38 @@ void Game::Start()
 
 void Game::DrawLevel()
 {
-	LevelPosY += (int)LEVEL_ACCELERATION;
 	DrawMovingYRectangles(4);
 	DrawProgressBar();
 }
 
 void Game::DrawProgressBar()
 {
-	float GrowAlpha = (float)(GetTime() / LEVEL_TIME);
-	float Progress = SCREEN_WIDTH * GrowAlpha;
+	if (!paused) {
+		TimePassed += GetFrameTime();
+	}
+
+	float GrowAlpha = (float)(TimePassed / LEVEL_TIME);
+	float BarWidth = SCREEN_WIDTH * GrowAlpha;
+	int Progress = (int)((BarWidth * 100) / SCREEN_WIDTH);
+
+	DrawRectangle(0, 0, SCREEN_WIDTH, 35, BLACK);
+
+	DrawRectangle(0, 10, (int)BarWidth, 15, WHITE);
 
 	DrawText(
-		TextFormat("Time: %d", (int)GetTime()),
-		100,
-		540,
-		16,
-		WHITE);
+		TextFormat("Progress: %d %", (int)Progress),
+		20,
+		10,
+		15,
+		BLACK);
+	// Esto es un apanyo porque no sé como pintar "10%", solo pinta "10"
 	DrawText(
-		TextFormat("Time: %f", (float)(GrowAlpha)),
-		100,
-		580,
-		16,
-		WHITE);
+		"%",
+		115,
+		10,
+		15,
+		BLACK);
 
-	DrawRectangle(0, 0, (int)Progress, 20, WHITE);
 }
 
 void Game::DrawMovingYRectangles(int quantity)
@@ -92,6 +109,7 @@ void Game::DrawMovingYRectangles(int quantity)
 			RectangleColorsLeft[i] = GetRandomColor();
 			startedLeft[i] = true;
 			YPositionsLeft[i] = -HeightsLeft[i] * (i + 1);
+
 		}
 		else {
 
