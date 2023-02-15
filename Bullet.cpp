@@ -139,7 +139,7 @@ Bullet::Bullet(
 				if (collision) {
 					if (impacted[i] != true) {
 						PlaySound(impactSound);
-						HealthCompInput->ApplyDamage(10);
+						HealthCompInput->ApplyDamage(12310);
 						impacted[i] = true;
 					}
 				}
